@@ -1,22 +1,33 @@
 "use client";
+
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { updateTokenPrice } from "../store/tokenSlice";
+import { updateTokenPrice } from "@/store/tokenSlice";
 
-export function useWebSocketMock() {
+/**
+ * Mock WebSocket Hook
+ * Simulates live price updates every few seconds.
+ * Useful for demo and testing when no real WebSocket feed exists.
+ */
+export const useWebSocketMock = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
     const interval = setInterval(() => {
-      // Simulate small random market fluctuations
+      // Pick a random token ID between 1 and 5 (convert to string for type safety)
+      const randomId = (Math.floor(Math.random() * 5) + 1).toString();
+
+      // Generate a small random percentage change (-1% to +1%)
+      const randomChange = (Math.random() - 0.5) * 2;
+
       dispatch(
         updateTokenPrice({
-          id: Math.floor(Math.random() * 5) + 1, // pick a random token (1–5)
-          percentChange: (Math.random() - 0.5) * 2, // between -1% and +1%
+          id: randomId, // ✅ fixed: now a string
+          percentChange: randomChange,
         })
       );
-    }, 2000);
+    }, 5000);
 
     return () => clearInterval(interval);
   }, [dispatch]);
-}
+};
