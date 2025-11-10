@@ -6,24 +6,26 @@ import { updateTokenPrice } from "@/store/tokenSlice";
 
 /**
  * Mock WebSocket Hook
- * Simulates live price updates every few seconds.
- * Useful for demo and testing when no real WebSocket feed exists.
+ * Simulates live price updates every few seconds
+ * for demo/testing when no live socket is connected.
  */
 export const useWebSocketMock = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
     const interval = setInterval(() => {
-      // Pick a random token ID between 1 and 5 (convert to string for type safety)
+      // Pick a random token ID between 1 and 5
       const randomId = (Math.floor(Math.random() * 5) + 1).toString();
 
-      // Generate a small random percentage change (-1% to +1%)
-      const randomChange = (Math.random() - 0.5) * 2;
+      // Simulate a small random price fluctuation (-1% to +1%)
+      const randomPercentChange = (Math.random() - 0.5) * 2;
 
+      // Dispatch a mock price update
       dispatch(
         updateTokenPrice({
-          id: randomId, // ✅ fixed: now a string
-          percentChange: randomChange,
+          id: randomId, // type: string ✅
+          price: 0,     // placeholder (we’ll compute it in slice)
+          change: randomPercentChange, // renamed correctly ✅
         })
       );
     }, 5000);
