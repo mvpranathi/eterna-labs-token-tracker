@@ -48,7 +48,7 @@ The **Eterna Labs Token Tracker** displays live cryptocurrency prices with dynam
 ## 🎥 Demo Video
 
 > 🎬 **Watch the 1–2 Minute Walkthrough:**  
-> [https://www.youtube.com/watch?v=YOUR_VIDEO_ID](https://www.youtube.com/watch?v=YOUR_VIDEO_ID)
+> [https://youtu.be/oxZPWYfso7Q](https://www.youtube.com/watch?v=YOUR_VIDEO_ID)
 
 *(Replace the above with your actual YouTube link)*
 
