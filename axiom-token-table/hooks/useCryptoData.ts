@@ -1,56 +1,61 @@
 "use client";
+
 import { useEffect } from "react";
+import axios from "axios";
 import { useDispatch } from "react-redux";
-import { setTokens, updateTokenPrice } from "../store/tokenSlice";
+import { setTokens } from "@/store/tokenSlice";
 
-const COINS = ["bitcoin", "ethereum", "solana", "avalanche-2", "polygon"]; // CoinGecko IDs
+interface Token {
+  id: string;
+  name: string;
+  symbol: string;
+  price: number;
+  change: number;
+}
 
-export function useCryptoData() {
+export const useCryptoData = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    async function fetchData() {
+    const fetchCryptoData = async () => {
       try {
-        const response = await fetch(
-          `https://api.coingecko.com/api/v3/simple/price?ids=${COINS.join(
-            ","
-          )}&vs_currencies=usd&include_24hr_change=true`
+        const response = await axios.get(
+          "https://api.coingecko.com/api/v3/coins/markets",
+          {
+            params: {
+              vs_currency: "usd",
+              ids: "bitcoin,ethereum,solana,polygon,avalanche",
+              order: "market_cap_desc",
+              per_page: 10,
+              page: 1,
+              sparkline: false,
+            },
+          }
         );
-        const data = await response.json();
 
-        // Convert data into your token format
-        const updated = Object.entries(data).map(([key, value]: any, idx) => {
-          const symbol =
-            key === "bitcoin"
-              ? "BTC"
-              : key === "ethereum"
-              ? "ETH"
-              : key === "solana"
-              ? "SOL"
-              : key === "avalanche-2"
-              ? "AVAX"
-              : "MATIC";
+        const data = response.data;
 
-          return {
-            id: idx + 1,
-            name: symbol === "BTC" ? "Bitcoin" :
-                  symbol === "ETH" ? "Ethereum" :
-                  symbol === "SOL" ? "Solana" :
-                  symbol === "AVAX" ? "Avalanche" : "Polygon",
-            symbol,
-            price: value.usd,
-            change: value.usd_24h_change?.toFixed(2),
-          };
-        });
+        const updated: Token[] = data.map((token: any) => ({
+          // ✅ ensure the ID is a string
+          id: token.id.toString(),
+          name: token.name,
+          symbol: token.symbol.toUpperCase(),
+          price: token.current_price,
+          change: token.price_change_percentage_24h,
+        }));
 
+        // ✅ dispatch the tokens to Redux store
         dispatch(setTokens(updated));
       } catch (error) {
         console.error("Error fetching crypto data:", error);
       }
-    }
+    };
 
-    fetchData();
-    const interval = setInterval(fetchData, 10000); // refresh every 10s
+    // Initial fetch
+    fetchCryptoData();
+
+    // Auto-refresh every 10 seconds
+    const interval = setInterval(fetchCryptoData, 10000);
     return () => clearInterval(interval);
   }, [dispatch]);
-}
+};
